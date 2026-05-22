@@ -100,7 +100,10 @@ export const handleStripeWebhook = async (
 
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object
-    await onPaymentSuccess(paymentIntent.id, paymentIntent.metadata)
+    await onPaymentSuccess(
+      paymentIntent.id,
+      paymentIntent.metadata as { purchaseId: string; cardId: string; userId: string },
+    )
   }
 
   if (event.type === 'payment_intent.payment_failed') {

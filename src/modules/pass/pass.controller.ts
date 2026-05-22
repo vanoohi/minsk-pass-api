@@ -6,7 +6,7 @@ import * as passService from './pass.service'
 
 export const getPass = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const result = await passService.getPass(req.userId!, req.params['cardId']!)
+    const result = await passService.getPass(req.userId!, req.params['cardId'] as string)
     res.json(result)
   } catch (err) {
     next(err)
@@ -31,7 +31,7 @@ export const checkCanPurchase = async (req: AuthRequest, res: Response, next: Ne
 
     const result = await passService.checkCanPurchase(
       req.userId!,
-      req.params['cardId']!,
+      req.params['cardId'] as string,
       type as PassType,
       transport as TransportType,
     )

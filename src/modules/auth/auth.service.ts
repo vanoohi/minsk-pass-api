@@ -7,12 +7,16 @@ import { RegisterDtoType, LoginDtoType } from './auth.dto'
 const SALT_ROUNDS = 10
 
 const generateTokens = (userId: string) => {
-  const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET!, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRES ?? '15m',
-  })
-  const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES ?? '30d',
-  })
+  const accessToken = jwt.sign(
+    { userId },
+    process.env.JWT_ACCESS_SECRET!,
+    { expiresIn: (process.env.JWT_ACCESS_EXPIRES ?? '15m') as jwt.SignOptions['expiresIn'] },
+  )
+  const refreshToken = jwt.sign(
+    { userId },
+    process.env.JWT_REFRESH_SECRET!,
+    { expiresIn: (process.env.JWT_REFRESH_EXPIRES ?? '30d') as jwt.SignOptions['expiresIn'] },
+  )
   return { accessToken, refreshToken }
 }
 
