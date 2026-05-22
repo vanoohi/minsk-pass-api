@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  password       String
+  name           String
+  cards          Card[]
+  refreshTokens  RefreshToken[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Card {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardNumber String     @unique
+  alias      String?
+  pass       Pass?
+  purchases  Purchase[]
+  rides      Ride[]
+  createdAt  DateTime   @default(now())
+}
+
+model Pass {
+  id        String        @id @default(uuid())
+  cardId    String        @unique
+  card      Card          @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  type      PassType
+  transport TransportType
+  tripsLeft Int?
+  expiresAt DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Purchase {
+  id           String         @id @default(uuid())
+  cardId       String
+  card         Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  passType     PassType
+  transport    TransportType
+  tripsAmount  Int?
+  durationDays Int?
+  amount       Decimal        @db.Decimal(10, 2)
+  status       PurchaseStatus @default(PENDING)
+  stripeId     String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Ride {
+  id          String        @id @default(uuid())
+  cardId      String
+  card        Card          @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  transport   TransportType
+  validatedAt DateTime      @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+enum PassType {
+  TRIPS
+  SUBSCRIPTION
+}
+
+enum TransportType {
+  METRO
+  GROUND
+  ALL
+}
+
+enum PurchaseStatus {
+  PENDING
+  DONE
+  FAILED
+}
