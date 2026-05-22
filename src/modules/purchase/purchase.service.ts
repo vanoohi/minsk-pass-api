@@ -62,6 +62,10 @@ export const createPurchase = async (userId: string, dto: CreatePurchaseDtoType)
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountKopecks,
     currency: 'byn',
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: 'never',
+    },
     metadata: {
       purchaseId: purchase.id,
       cardId: dto.cardId,
