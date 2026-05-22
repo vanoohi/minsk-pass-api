@@ -155,16 +155,21 @@ const onPaymentSuccess = async (
   })
 
   // Отправляем email
-  await sendPurchaseSuccessEmail(
-    purchase.card.user.email,
-    purchase.card.cardNumber,
-    purchase.passType,
-    purchase.transport,
-    purchase.tripsAmount ?? undefined,
-    purchase.passType === PassType.SUBSCRIPTION
-      ? new Date(Date.now() + (purchase.durationDays ?? 30) * 24 * 60 * 60 * 1000)
-      : undefined,
-  )
+  try {
+    await sendPurchaseSuccessEmail(
+      purchase.card.user.email,
+      purchase.card.cardNumber,
+      purchase.passType,
+      purchase.transport,
+      purchase.tripsAmount ?? undefined,
+      purchase.passType === PassType.SUBSCRIPTION
+        ? new Date(Date.now() + (purchase.durationDays ?? 30) * 24 * 60 * 60 * 1000)
+        : undefined,
+    )
+    console.log(`📧 Email sent to ${purchase.card.user.email}`)
+  } catch (err) {
+    console.error('❌ Failed to send email:', err)
+  }
 }
 
 const onPaymentFailed = async (stripeId: string) => {
