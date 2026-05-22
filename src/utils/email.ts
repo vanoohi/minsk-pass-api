@@ -25,10 +25,10 @@ export const sendPurchaseSuccessEmail = async (
   await resend.emails.send({
     from: process.env.EMAIL_FROM ?? 'MinskPass <onboarding@resend.dev>',
     to,
-    subject: '✅ MinskPass — Card topped up',
+    subject: 'MinskPass — Card topped up',
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="color: #22c55e;">Card topped up ✅</h2>
+        <h2 style="color: #22c55e;">Card topped up</h2>
         <p>Card number: <strong>${cardNumber}</strong></p>
         <p>Purchased: ${what}</p>
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
@@ -45,10 +45,10 @@ export const sendPurchaseFailedEmail = async (
   await resend.emails.send({
     from: process.env.EMAIL_FROM ?? 'MinskPass <onboarding@resend.dev>',
     to,
-    subject: '❌ MinskPass — Payment failed',
+    subject: 'MinskPass — Payment failed',
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="color: #ef4444;">Payment failed ❌</h2>
+        <h2 style="color: #ef4444;">Payment failed</h2>
         <p>Card number: <strong>${cardNumber}</strong></p>
         <p>Your payment could not be processed. No money was charged.</p>
         <p>Please try again.</p>
