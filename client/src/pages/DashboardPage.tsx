@@ -87,7 +87,7 @@ export const DashboardPage = () => {
   return (
     <Layout>
       {/* Greeting */}
-      <div className="mb-8 animate-fade-in">
+      <div className="mb-8 fade-in">
         <h1 className="text-2xl font-bold text-slate-900">
           Hello, {user?.name?.split(' ')[0]}
         </h1>
@@ -102,7 +102,7 @@ export const DashboardPage = () => {
           ))}
         </div>
       ) : cards.length === 0 && !showForm ? (
-        <div className="text-center py-20 animate-fade-in">
+        <div className="text-center py-20 fade-in">
           <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-blue-100">
             <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
               <rect x="3" y="6" width="18" height="13" rx="2" stroke="#2563eb" strokeWidth="1.5"/>
@@ -121,7 +121,7 @@ export const DashboardPage = () => {
         <div className="space-y-4">
           {cards.map((card, i) => (
             <button key={card.id} onClick={() => navigate(`/cards/${card.id}`)}
-              className="w-full text-left rounded-3xl p-6 shadow-lg shadow-blue-200/40 hover:shadow-xl hover:shadow-blue-300/40 hover:-translate-y-0.5 transition-all duration-200 animate-fade-in relative overflow-hidden"
+              className="w-full text-left rounded-3xl p-6 shadow-lg shadow-blue-200/40 hover:shadow-xl hover:shadow-blue-300/40 hover:-translate-y-0.5 transition-all duration-200 fade-in relative overflow-hidden"
               style={{ background: cardGradients[i % cardGradients.length] }}>
 
               {/* Background pattern */}
@@ -176,7 +176,7 @@ export const DashboardPage = () => {
 
       {/* Add card form */}
       {showForm && (
-        <div className="mt-4 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm shadow-slate-100 animate-fade-in">
+        <div className="mt-4 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm shadow-slate-100 fade-in">
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-semibold text-slate-800">Add transit card</h3>
             <button onClick={() => { setShowForm(false); setError('') }}

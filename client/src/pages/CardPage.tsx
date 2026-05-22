@@ -105,7 +105,7 @@ export const CardPage = () => {
         Back
       </button>
 
-      <div className="space-y-4 animate-fade-in">
+      <div className="space-y-4 fade-in">
         {/* Card visual */}
         <div className="rounded-3xl p-7 text-white relative overflow-hidden shadow-xl shadow-blue-300/30"
           style={{ background: 'linear-gradient(135deg, #1e40af, #2563eb, #0ea5e9)' }}>
@@ -174,7 +174,7 @@ export const CardPage = () => {
             Top up card
           </button>
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5 animate-fade-in">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5 fade-in">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-slate-800">Choose pass</h3>
               <button onClick={() => { setShowBuy(false); setBuyError(''); setCheckMsg('') }}
