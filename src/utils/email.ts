@@ -1,19 +1,12 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import { TransportType, PassType } from '@prisma/client'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT),
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-})
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 const transportLabel: Record<TransportType, string> = {
-  METRO: 'метро',
-  GROUND: 'наземный транспорт',
-  ALL: 'все виды транспорта',
+  METRO: 'Metro',
+  GROUND: 'Ground transport (bus, tram, trolleybus)',
+  ALL: 'All transport types',
 }
 
 export const sendPurchaseSuccessEmail = async (
@@ -26,18 +19,21 @@ export const sendPurchaseSuccessEmail = async (
 ): Promise<void> => {
   const what =
     passType === PassType.TRIPS
-      ? `${tripsAmount} поездок (${transportLabel[transport]})`
-      : `Абонемент (${transportLabel[transport]}) до ${expiresAt?.toLocaleDateString('ru-BY')}`
+      ? `<strong>${tripsAmount} trips</strong> — ${transportLabel[transport]}`
+      : `<strong>Subscription</strong> — ${transportLabel[transport]} until <strong>${expiresAt?.toLocaleDateString('en-GB')}</strong>`
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM ?? 'MinskPass <onboarding@resend.dev>',
     to,
-    subject: 'MinskPass — Карта пополнена',
+    subject: '✅ MinskPass — Card topped up',
     html: `
-      <h2>Карта пополнена ✅</h2>
-      <p>Карта: <strong>${cardNumber}</strong></p>
-      <p>Куплено: <strong>${what}</strong></p>
-      <p>Спасибо за использование MinskPass!</p>
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #22c55e;">Card topped up ✅</h2>
+        <p>Card number: <strong>${cardNumber}</strong></p>
+        <p>Purchased: ${what}</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #6b7280; font-size: 14px;">Thank you for using MinskPass!</p>
+      </div>
     `,
   })
 }
@@ -46,14 +42,19 @@ export const sendPurchaseFailedEmail = async (
   to: string,
   cardNumber: string,
 ): Promise<void> => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
+  await resend.emails.send({
+    from: process.env.EMAIL_FROM ?? 'MinskPass <onboarding@resend.dev>',
     to,
-    subject: 'MinskPass — Платёж не прошёл',
+    subject: '❌ MinskPass — Payment failed',
     html: `
-      <h2>Платёж не прошёл ❌</h2>
-      <p>Карта: <strong>${cardNumber}</strong></p>
-      <p>Деньги не были списаны. Попробуйте снова.</p>
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #ef4444;">Payment failed ❌</h2>
+        <p>Card number: <strong>${cardNumber}</strong></p>
+        <p>Your payment could not be processed. No money was charged.</p>
+        <p>Please try again.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #6b7280; font-size: 14px;">MinskPass Support</p>
+      </div>
     `,
   })
 }
