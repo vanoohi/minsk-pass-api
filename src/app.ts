@@ -28,10 +28,13 @@ app.get('/health', (req, res) => {
 })
 
 // Serve React frontend in production
-const publicDir = path.join(__dirname, '..', 'public')
+const publicDir = path.join(process.cwd(), 'public')
 app.use(express.static(publicDir))
 app.get('*', (req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'))
+  const indexPath = path.join(publicDir, 'index.html')
+  res.sendFile(indexPath, (err) => {
+    if (err) res.status(404).json({ error: 'Not found' })
+  })
 })
 
 // Global error handler — always last
