@@ -32,6 +32,13 @@ app.get('/health', (req, res) => {
 const publicDir = path.join(process.cwd(), 'public')
 const indexPath = path.join(publicDir, 'index.html')
 
+console.log('CWD:', process.cwd())
+console.log('publicDir exists:', fs.existsSync(publicDir))
+console.log('indexPath exists:', fs.existsSync(indexPath))
+try {
+  console.log('/app contents:', fs.readdirSync('/app').join(', '))
+} catch {}
+
 app.use(express.static(publicDir))
 app.use((req, res, next) => {
   if (fs.existsSync(indexPath)) {
