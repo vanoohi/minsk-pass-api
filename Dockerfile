@@ -8,9 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Generate Prisma client
+# Generate Prisma client (dummy URL — only needed for code generation, not a real connection)
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate
 
 # Build backend
 COPY tsconfig.json ./
