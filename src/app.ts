@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import path from 'path'
+import fs from 'fs'
 import authRoutes from './modules/auth/auth.routes'
 import cardsRoutes from './modules/cards/cards.routes'
 import passRoutes from './modules/pass/pass.routes'
@@ -29,18 +30,18 @@ app.get('/health', (req, res) => {
 
 // Serve React frontend in production
 const publicDir = path.join(process.cwd(), 'public')
-console.log(`Static files dir: ${publicDir}`)
-import fs from 'fs'
-try {
-  console.log(`Public dir exists: ${fs.existsSync(publicDir)}, files: ${fs.existsSync(publicDir) ? fs.readdirSync(publicDir).slice(0, 5).join(', ') : 'none'}`)
-} catch (e) { console.log('Error checking public dir:', e) }
-app.use(express.static(publicDir))
-app.get('*', (req, res) => {
-  const indexPath = path.join(publicDir, 'index.html')
-  res.sendFile(indexPath, (err) => {
-    if (err) res.status(404).json({ error: 'Not found' })
+const indexPath = path.join(publicDir, 'index.html')
+
+console.log(`CWD: ${process.cwd()}`)
+console.log(`Public dir: ${publicDir} — exists: ${fs.existsSync(publicDir)}`)
+console.log(`Index.html exists: ${fs.existsSync(indexPath)}`)
+
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir))
+  app.get('*', (req, res) => {
+    res.sendFile(indexPath)
   })
-})
+}
 
 // Global error handler — always last
 app.use(errorMiddleware)
