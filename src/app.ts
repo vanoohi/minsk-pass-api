@@ -28,20 +28,18 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// Serve React frontend in production
+// Serve React frontend
 const publicDir = path.join(process.cwd(), 'public')
 const indexPath = path.join(publicDir, 'index.html')
 
-console.log(`CWD: ${process.cwd()}`)
-console.log(`Public dir: ${publicDir} — exists: ${fs.existsSync(publicDir)}`)
-console.log(`Index.html exists: ${fs.existsSync(indexPath)}`)
-
-if (fs.existsSync(publicDir)) {
-  app.use(express.static(publicDir))
-  app.use((req, res) => {
+app.use(express.static(publicDir))
+app.use((req, res, next) => {
+  if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath)
-  })
-}
+  } else {
+    next()
+  }
+})
 
 // Global error handler — always last
 app.use(errorMiddleware)
