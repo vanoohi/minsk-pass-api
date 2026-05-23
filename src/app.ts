@@ -38,7 +38,7 @@ console.log(`Index.html exists: ${fs.existsSync(indexPath)}`)
 
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir))
-  app.get('/{*path}', (req, res) => {
+  app.use((req, res) => {
     res.sendFile(indexPath)
   })
 }
