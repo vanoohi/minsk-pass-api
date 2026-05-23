@@ -22,7 +22,7 @@ COPY client/package*.json ./client/
 RUN npm ci --prefix client
 
 COPY client ./client
-RUN npm run build --prefix client -- --outDir ../public
+RUN npm run build --prefix client
 
 EXPOSE 3000
 
