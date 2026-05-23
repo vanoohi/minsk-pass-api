@@ -1,42 +1,28 @@
-FROM node:20-slim AS builder
-
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Build backend
-COPY package*.json ./
-RUN npm ci
-
-COPY prisma ./prisma
-RUN npx prisma generate
-
-COPY tsconfig.json ./
-COPY src ./src
-RUN npm run build
-
-# Build frontend
-COPY client/package*.json ./client/
-RUN cd client && npm ci
-
-COPY client ./client
-RUN cd client && VITE_API_URL=/api/v1 npm run build
-
-# Final image
 FROM node:20-slim
 
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
+# Install backend deps
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
+# Generate Prisma client
 COPY prisma ./prisma
 RUN npx prisma generate
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/client/dist ./public
+# Build backend
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
+# Install frontend deps and build
+COPY client/package*.json ./client/
+RUN npm ci --prefix client
+
+COPY client ./client
+RUN npm run build --prefix client -- --outDir ../public
 
 EXPOSE 3000
 
