@@ -19,7 +19,7 @@ RUN npm run build
 
 # Install frontend deps and build
 COPY client/package*.json ./client/
-RUN npm ci --prefix client
+RUN npm install --prefix client
 
 COPY client ./client
 RUN npm run build --prefix client
