@@ -29,6 +29,11 @@ app.get('/health', (req, res) => {
 
 // Serve React frontend in production
 const publicDir = path.join(process.cwd(), 'public')
+console.log(`Static files dir: ${publicDir}`)
+import fs from 'fs'
+try {
+  console.log(`Public dir exists: ${fs.existsSync(publicDir)}, files: ${fs.existsSync(publicDir) ? fs.readdirSync(publicDir).slice(0, 5).join(', ') : 'none'}`)
+} catch (e) { console.log('Error checking public dir:', e) }
 app.use(express.static(publicDir))
 app.get('*', (req, res) => {
   const indexPath = path.join(publicDir, 'index.html')
