@@ -28,6 +28,12 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+// Temp debug
+app.get('/debug', (req, res) => {
+  const cwd = process.cwd()
+  res.json({ cwd, files: fs.readdirSync(cwd), publicExists: fs.existsSync(path.join(cwd, 'public')) })
+})
+
 // Serve React frontend
 const publicDir = path.join(process.cwd(), 'public')
 const indexPath = path.join(publicDir, 'index.html')
