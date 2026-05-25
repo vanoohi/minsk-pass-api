@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
+import cors from 'cors'
 import path from 'path'
 import fs from 'fs'
 import authRoutes from './modules/auth/auth.routes'
@@ -10,6 +11,11 @@ import validateRoutes from './modules/validate/validate.routes'
 import { errorMiddleware } from './middleware/error.middleware'
 
 const app = express()
+
+app.use(cors({
+  origin: ['https://minsk-pass.vercel.app', 'http://localhost:5173'],
+  credentials: true,
+}))
 
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/v1/purchase/webhook', express.raw({ type: 'application/json' }))
@@ -25,7 +31,7 @@ app.use('/api/v1/validate', validateRoutes)
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: 'v2-with-frontend' })
 })
 
 // Temp debug
