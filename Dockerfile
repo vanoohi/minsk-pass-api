@@ -4,25 +4,17 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 
 WORKDIR /app
 
-# Install backend deps
 COPY package*.json ./
 RUN npm ci
 
-# Generate Prisma client (dummy URL — only needed for code generation, not a real connection)
 COPY prisma ./prisma
 RUN DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy npx prisma generate
 
-# Build backend
 COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
-# Install frontend deps and build
-COPY client/package*.json ./client/
-RUN npm install --prefix client
-
-COPY client ./client
-RUN npm run build --prefix client
+COPY public ./public
 
 EXPOSE 3000
 
