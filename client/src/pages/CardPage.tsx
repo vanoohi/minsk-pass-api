@@ -44,6 +44,9 @@ export const CardPage = () => {
   const [buyError, setBuyError] = useState('')
   const [checkMsg, setCheckMsg] = useState('')
   const [buyLoading, setBuyLoading] = useState(false)
+  const [editingAlias, setEditingAlias] = useState(false)
+  const [aliasValue, setAliasValue] = useState('')
+  const [aliasSaving, setAliasSaving] = useState(false)
 
   const fetchCard = async () => {
     const { data } = await api.get(`/cards/${id}`)
@@ -51,6 +54,17 @@ export const CardPage = () => {
   }
 
   useEffect(() => { fetchCard() }, [id])
+
+  const handleSaveAlias = async () => {
+    setAliasSaving(true)
+    try {
+      const { data } = await api.patch(`/cards/${id}`, { alias: aliasValue.trim() || null })
+      setCard(prev => prev ? { ...prev, alias: data.alias } : prev)
+      setEditingAlias(false)
+    } finally {
+      setAliasSaving(false)
+    }
+  }
 
   const check = async (type: PassType, tr: TransportType) => {
     try {
@@ -117,7 +131,41 @@ export const CardPage = () => {
           </div>
           <div className="relative">
             <p className="text-blue-200 text-xs font-medium uppercase tracking-widest mb-4">MinskPass · Transit card</p>
-            <p className="text-2xl font-bold mb-1">{card.alias ?? `Card ${card.cardNumber}`}</p>
+            {editingAlias ? (
+              <div className="flex items-center gap-2 mb-1">
+                <input
+                  autoFocus
+                  value={aliasValue}
+                  onChange={(e) => setAliasValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSaveAlias(); if (e.key === 'Escape') setEditingAlias(false) }}
+                  placeholder={`Card ${card.cardNumber}`}
+                  className="bg-white/20 text-white placeholder-white/50 rounded-lg px-3 py-1.5 text-lg font-bold w-full focus:outline-none focus:ring-2 focus:ring-white/50"
+                />
+                <button onClick={handleSaveAlias} disabled={aliasSaving}
+                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center shrink-0 disabled:opacity-50 transition-colors">
+                  {aliasSaving
+                    ? <div className="w-3 h-3 border border-white/60 border-t-transparent rounded-full animate-spin" />
+                    : <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  }
+                </button>
+                <button onClick={() => setEditingAlias(false)}
+                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center shrink-0 transition-colors">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-2xl font-bold">{card.alias ?? `Card ${card.cardNumber}`}</p>
+                <button
+                  onClick={() => { setAliasValue(card.alias ?? ''); setEditingAlias(true) }}
+                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            )}
             <p className="text-blue-300 font-mono text-sm tracking-wider">{card.cardNumber.replace(/(\d{4})/g, '$1 ').trim()}</p>
           </div>
         </div>

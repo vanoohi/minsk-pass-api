@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { CardPage } from './pages/CardPage'
+import { HistoryPage } from './pages/HistoryPage'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth()
@@ -17,8 +18,9 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-    <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+<Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
     <Route path="/cards/:id" element={<ProtectedRoute><CardPage /></ProtectedRoute>} />
+    <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 )

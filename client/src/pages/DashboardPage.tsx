@@ -49,6 +49,7 @@ export const DashboardPage = () => {
   const [alias, setAlias] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -62,6 +63,17 @@ export const DashboardPage = () => {
   }
 
   useEffect(() => { fetchCards() }, [])
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    setDeletingId(id)
+    try {
+      await api.delete(`/cards/${id}`)
+      setCards(prev => prev.filter(c => c.id !== id))
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -154,9 +166,23 @@ export const DashboardPage = () => {
                     <div key={j} className="w-6 h-4 rounded-sm bg-white/20" />
                   ))}
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/40">
-                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={(e) => handleDelete(e, card.id)}
+                    disabled={deletingId === card.id}
+                    className="w-7 h-7 rounded-full bg-white/10 hover:bg-red-500/60 flex items-center justify-center transition-colors disabled:opacity-50">
+                    {deletingId === card.id ? (
+                      <div className="w-3 h-3 border border-white/60 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <svg width="13" height="13" fill="none" viewBox="0 0 24 24">
+                        <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </button>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/40">
+                    <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
             </button>
           ))}

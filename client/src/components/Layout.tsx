@@ -23,7 +23,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <span className="text-lg">MinskPass</span>
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/history')}
+              title="Purchase history"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+            >
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            </button>
+<div className="w-px h-5 bg-slate-200 mx-1" />
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white bg-blue-600"
             >
