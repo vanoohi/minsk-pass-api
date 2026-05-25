@@ -12,10 +12,7 @@ import { errorMiddleware } from './middleware/error.middleware'
 
 const app = express()
 
-app.use(cors({
-  origin: ['https://minsk-pass.vercel.app', 'http://localhost:5173'],
-  credentials: true,
-}))
+app.use(cors())
 
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/v1/purchase/webhook', express.raw({ type: 'application/json' }))
