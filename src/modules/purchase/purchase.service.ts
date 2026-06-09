@@ -188,13 +188,37 @@ const onPaymentFailed = async (stripeId: string) => {
   await sendPurchaseFailedEmail(purchase.card.user.email, purchase.card.cardNumber)
 }
 
-export const getPurchaseHistory = async (userId: string, cardId?: string) => {
-  return prisma.purchase.findMany({
-    where: {
-      card: { userId },
-      ...(cardId ? { cardId } : {}),
-    },
-    include: { card: { select: { cardNumber: true, alias: true } } },
-    orderBy: { createdAt: 'desc' },
-  })
+export const getPurchaseHistory = async (
+  userId: string,
+  page: number,
+  limit: number,
+  cardId?: string,
+) => {
+  const skip = (page - 1) * limit
+
+  const [items, total] = await Promise.all([
+    prisma.purchase.findMany({
+      where: {
+        card: { userId },
+        ...(cardId ? { cardId } : {}),
+      },
+      include: { card: { select: { cardNumber: true, alias: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.purchase.count({
+      where: {
+        card: { userId },
+        ...(cardId ? { cardId } : {}),
+      },
+    }),
+  ])
+
+  return {
+    data: items,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  }
 }

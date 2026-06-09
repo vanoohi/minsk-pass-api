@@ -29,12 +29,22 @@ const statusConfig: Record<PurchaseStatus, { label: string; class: string }> = {
 export const HistoryPage = () => {
   const [purchases, setPurchases] = useState<Purchase[]>([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
-    api.get('/purchase/history')
-      .then(({ data }) => setPurchases(data))
-      .finally(() => setLoading(false))
-  }, [])
+    const fetch = async () => {
+      setLoading(true)
+      try {
+        const { data } = await api.get(`/purchase/history?page=${page}&limit=10`)
+        setPurchases(data.data)
+        setTotalPages(data.totalPages)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetch()
+  }, [page])
 
   return (
     <Layout>
@@ -60,31 +70,55 @@ export const HistoryPage = () => {
           <p className="text-slate-400 text-sm mt-1">Top up a card to see history here</p>
         </div>
       ) : (
-        <div className="space-y-2 fade-in">
-          {purchases.map((p) => (
-            <div key={p.id}
-              className="bg-white border border-slate-200 rounded-2xl px-5 py-4 hover:border-slate-300 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800">
-                    {p.passType === 'TRIPS'
-                      ? `${p.tripsAmount} trips · ${transportLabel[p.transport]}`
-                      : `Subscription · ${transportLabel[p.transport]} · ${p.durationDays} days`}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-0.5 truncate">
-                    {p.card.alias ?? p.card.cardNumber} · {new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2.5 shrink-0">
-                  <span className="text-sm font-bold text-slate-800">{Number(p.amount).toFixed(2)} BYN</span>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${statusConfig[p.status].class}`}>
-                    {statusConfig[p.status].label}
-                  </span>
+        <>
+          <div className="space-y-2 fade-in">
+            {purchases.map((p) => (
+              <div key={p.id}
+                className="bg-white border border-slate-200 rounded-2xl px-5 py-4 hover:border-slate-300 transition-colors">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-800">
+                      {p.passType === 'TRIPS'
+                        ? `${p.tripsAmount} trips · ${transportLabel[p.transport]}`
+                        : `Subscription · ${transportLabel[p.transport]} · ${p.durationDays} days`}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5 truncate">
+                      {p.card.alias ?? p.card.cardNumber} · {new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <span className="text-sm font-bold text-slate-800">{Number(p.amount).toFixed(2)} BYN</span>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${statusConfig[p.status].class}`}>
+                      {statusConfig[p.status].label}
+                    </span>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <button
+                onClick={() => setPage(p => p - 1)}
+                disabled={page === 1}
+                className="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 text-slate-600 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                ← Prev
+              </button>
+              <span className="text-sm text-slate-500">
+                {page} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={page === totalPages}
+                className="px-4 py-2 rounded-xl text-sm font-medium border border-slate-200 text-slate-600 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                Next →
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </Layout>
   )

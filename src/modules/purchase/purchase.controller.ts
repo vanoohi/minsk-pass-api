@@ -24,11 +24,16 @@ export const stripeWebhook = async (req: Request, res: Response, next: NextFunct
 export const getPurchaseHistory = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { cardId } = req.query
-    const history = await purchaseService.getPurchaseHistory(
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 10
+
+    const result = await purchaseService.getPurchaseHistory(
       req.userId!,
+      page,
+      limit,
       cardId as string | undefined,
     )
-    res.json(history)
+    res.json(result)
   } catch (err) {
     next(err)
   }
