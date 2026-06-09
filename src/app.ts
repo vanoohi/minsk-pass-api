@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import fs from 'fs'
+import helmet from 'helmet'
 import authRoutes from './modules/auth/auth.routes'
 import cardsRoutes from './modules/cards/cards.routes'
 import passRoutes from './modules/pass/pass.routes'
@@ -12,7 +13,11 @@ import { errorMiddleware } from './middleware/error.middleware'
 
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGIN ?? '*',
+  credentials: true
+}))
+app.use(helmet())
 
 // Stripe webhook needs raw body — MUST be before express.json()
 app.use('/api/v1/purchase/webhook', express.raw({ type: 'application/json' }))
